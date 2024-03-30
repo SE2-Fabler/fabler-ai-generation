@@ -12,6 +12,11 @@ repositories {
 
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
+    implementation("com.aallam.openai:openai-client:3.7.0")
+    implementation("io.ktor:ktor-client-core:2.3.8")
+    implementation("io.ktor:ktor-client-cio:2.3.8")
+
+    implementation("org.slf4j:slf4j-simple:2.0.12")
 }
 
 tasks.test {
