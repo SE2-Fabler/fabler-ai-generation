@@ -19,6 +19,17 @@ class ChatGPT(key: String = System.getenv("OPENAI_API_KEY")) {
 
     private var chatHistory: MutableList<ChatMessage> = ArrayList()
 
+    // Add a message to the chat history without generating a response
+    fun addMessage(prompt: String) {
+        chatHistory.add(
+            ChatMessage(
+                role = ChatRole.User,
+                content = prompt
+            )
+        )
+    }
+
+    // Add a message to the chat history and generate a response from OpenAI
     suspend fun sendRequest(prompt: String, params: GPTFunction? = null): ChatMessage {
 
         chatHistory.add(
