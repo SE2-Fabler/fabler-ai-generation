@@ -1,9 +1,10 @@
 package com.kaneki
 
+import com.kaneki.models.Character
 import com.kaneki.models.characterParams
 import com.kaneki.models.sceneParams
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.*
 
 class Story(prompt: String) {
 
@@ -11,7 +12,7 @@ class Story(prompt: String) {
 
     var synopsis: String
 
-    var characters: JsonObject
+    var characters: List<Character>
 
     var scenes: JsonObject
 
@@ -27,9 +28,12 @@ class Story(prompt: String) {
 
             synopsis = chatGPT.sendRequest("Generate a short one-sentence synopsis for this story")
 
-            characters = chatGPT.sendRequest("Limit the number of characters to a maximum of 3. Return " +
+            val charactersJson = chatGPT.sendRequest("Limit the number of characters to a maximum of 3. Return " +
                     "each of the characters in the story, along with a detailed description of personality, clothing, " +
                     "and physical appearance details (include age, race, gender).", characterParams)
+
+            val characterListJson = charactersJson["inner"]
+            characters = Json.decodeFromJsonElement<List<Character>>(characterListJson!!)
 
             scenes = chatGPT.sendRequest("Separate the story into multiple scenes, and for each scene, " +
                     "provide a long and detailed description of the setting of the scene, omit any descriptions of " +

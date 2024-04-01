@@ -2,16 +2,25 @@ package com.kaneki.models
 
 import com.aallam.openai.api.core.Parameters
 import com.kaneki.GPTFunction
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
+@Serializable
+data class Character (
+    val name: String,
+    val personality: String,
+    val clothing: String,
+    val appearance: String
+)
+
 val characterParams = GPTFunction("getCharacters", "Get detailed information about each character in the story",
     Parameters.buildJsonObject {
         put("type", "object")
         putJsonObject("properties") {
-            putJsonObject("characters") {
+            putJsonObject("inner") {
                 put("type", "array")
                 put("description", "List of characters in the story")
                 putJsonObject("items") {
@@ -39,7 +48,7 @@ val characterParams = GPTFunction("getCharacters", "Get detailed information abo
             }
         }
         putJsonArray("required") {
-            add("characters")
+            add("inner")
         }
     }
 )
