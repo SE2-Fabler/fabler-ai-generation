@@ -30,7 +30,7 @@ class ChatGPT(key: String = System.getenv("OPENAI_API_KEY")) {
     }
 
     // Add a message to the chat history and generate a response from OpenAI
-    suspend fun sendRequest(prompt: String, params: GPTFunction? = null): ChatMessage {
+    suspend fun sendRequest(prompt: String): String {
 
         chatHistory.add(
             ChatMessage(
@@ -39,44 +39,61 @@ class ChatGPT(key: String = System.getenv("OPENAI_API_KEY")) {
             )
         )
 
-        val chatCompletionRequest = if(params != null) {
-            chatCompletionRequest {
-                model = ModelId("gpt-3.5-turbo")
-                messages = chatHistory
-                tools {
-                    function(
-                        name = params.name,
-                        description = params.description,
-                        parameters = params.params
-                    )
-                }
-                toolChoice = ToolChoice.Auto
-            }
-        } else {
-            ChatCompletionRequest(
-                model = ModelId("gpt-3.5-turbo"),
-                messages = chatHistory
-            )
-        }
+        val chatCompletionRequest = ChatCompletionRequest(
+            model = ModelId("gpt-3.5-turbo"),
+            messages = chatHistory
+        )
 
         val completion: ChatCompletion = openAI.chatCompletion(chatCompletionRequest)
 
         chatHistory.add(completion.choices.first().message)
-        return chatHistory.last()
+        return chatHistory.last().content.toString()
 
     }
 
-}
+    // Add a message to the chat history and generate a response from OpenAI with tool calling
+    suspend fun sendRequest(prompt: String, params: GPTFunction): JsonObject {
 
-fun ChatMessage.toJson(): JsonObject {
+        chatHistory.add(
+            ChatMessage(
+                role = ChatRole.User,
+                content = prompt
+            )
+        )
 
-    val result: HashMap<String, JsonElement> = HashMap()
+        val chatCompletionRequest = chatCompletionRequest {
+            model = ModelId("gpt-3.5-turbo")
+            messages = chatHistory
+            tools {
+                function(
+                    name = params.name,
+                    description = params.description,
+                    parameters = params.params
+                )
+            }
+            toolChoice = ToolChoice.function(params.name)
+        }
 
-    for (toolCall in this.toolCalls.orEmpty()) {
-        require(toolCall is ToolCall.Function) { "Tool call is not a function" }
-        result.putAll(toolCall.function.argumentsAsJson())
+        val completion: ChatCompletion = openAI.chatCompletion(chatCompletionRequest)
+        chatHistory.add(completion.choices.first().message)
+
+        val result: HashMap<String, JsonElement> = HashMap()
+
+        for (toolCall in completion.choices.first().message.toolCalls.orEmpty()) {
+            require(toolCall is ToolCall.Function) { "Tool call is not a function" }
+
+            chatHistory.add(ChatMessage(
+                role = ChatRole.Tool,
+                toolCallId = toolCall.id,
+                name = toolCall.function.name,
+                content = toolCall.function.argumentsAsJson().toString()
+            ))
+
+            result.putAll(toolCall.function.argumentsAsJson())
+        }
+
+        return JsonObject(result)
+
     }
-
-    return JsonObject(result)
 
 }
