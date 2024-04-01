@@ -8,6 +8,7 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
+
 @Serializable
 data class Character (
     val name: String,
@@ -15,6 +16,7 @@ data class Character (
     val clothing: String,
     val appearance: String
 )
+
 
 val characterParams = GPTFunction("getCharacters", "Get detailed information about each character in the story",
     Parameters.buildJsonObject {

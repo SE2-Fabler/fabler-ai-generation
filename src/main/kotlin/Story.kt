@@ -1,8 +1,6 @@
 package com.kaneki
 
-import com.kaneki.models.Character
-import com.kaneki.models.characterParams
-import com.kaneki.models.sceneParams
+import com.kaneki.models.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.*
 
@@ -14,7 +12,7 @@ class Story(prompt: String) {
 
     var characters: List<Character>
 
-    var scenes: JsonObject
+    var scenes: List<Scene>
 
     init {
 
@@ -30,20 +28,21 @@ class Story(prompt: String) {
 
             val charactersJson = chatGPT.sendRequest("Limit the number of characters to a maximum of 3. Return " +
                     "each of the characters in the story, along with a detailed description of personality, clothing, " +
-                    "and physical appearance details (include age, race, gender).", characterParams)
+                    "and physical appearance details (include age, race, gender).", characterParams)["inner"]
 
-            val characterListJson = charactersJson["inner"]
-            characters = Json.decodeFromJsonElement<List<Character>>(characterListJson!!)
+            characters = Json.decodeFromJsonElement<List<Character>>(charactersJson!!)
 
-            scenes = chatGPT.sendRequest("Separate the story into multiple scenes, and for each scene, " +
+            val scenesJson = chatGPT.sendRequest("Separate the story into multiple scenes, and for each scene, " +
                     "provide a long and detailed description of the setting of the scene, omit any descriptions of " +
                     "people, include the name of the location, physical location it takes place in, objects, and " +
                     "landmarks in the scene, mood, and time of day. Also create a title each scene that corresponds " +
                     "to the contents of the scene. Furthermore, for each scene, write me a script and return the " +
                     "result in a list with each element as a character's dialogue, and use a facial expression from " +
                     "this list: smiling, crying, nervous, excited, blushing to match the dialogue spoken. Also for " +
-                    "each scene, tell me the music genre from this list Funky, Calm, Dark, Inspirational, Bright, " +
-                    "Dramatic, Happy, Romantic, Angry, Sad", sceneParams)
+                    "each scene, select a music genre from this list Funky, Calm, Dark, Inspirational, Bright, " +
+                    "Dramatic, Happy, Romantic, Angry, Sad", sceneParams)["inner"]
+
+            scenes = Json.decodeFromJsonElement<List<Scene>>(scenesJson!!)
 
         }
 

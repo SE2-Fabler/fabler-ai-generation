@@ -2,7 +2,33 @@ package com.kaneki.models
 
 import com.aallam.openai.api.core.Parameters
 import com.kaneki.GPTFunction
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+
+
+enum class Music {
+    Funky, Calm, Dark, Inspirational, Bright, Dramatic, Happy, Romantic, Angry, Sad
+}
+
+
+@Serializable
+data class Location (
+    val name: String,
+    val description: String,
+    val landmarks: String,
+    @SerialName("time_of_day")
+    val timeOfDay: String
+)
+
+
+@Serializable
+data class Scene (
+    val title: String,
+    val music: Music,
+    val location: Location
+)
+
 
 val sceneParams = GPTFunction("getScenes", "Extract detailed information about scenes in the story",
     Parameters.buildJsonObject {
