@@ -8,7 +8,7 @@ import kotlinx.serialization.json.*
 
 
 enum class Music {
-    Funky, Calm, Dark, Inspirational, Bright, Dramatic, Happy, Romantic, Angry, Sad
+    Funky, Calm, Dark, Inspirational, Bright, Dramatic, Happy, Romantic, Angry, Sad, Excited
 }
 
 
@@ -26,7 +26,8 @@ data class Location (
 data class Scene (
     val title: String,
     val music: Music,
-    val location: Location
+    val location: Location,
+    var script: MutableList<Dialogue> = ArrayList()
 )
 
 
@@ -57,6 +58,7 @@ val sceneParams = GPTFunction("getScenes", "Extract detailed information about s
                                 add("Romantic")
                                 add("Angry")
                                 add("Sad")
+                                add("Excited")
                             }
                             put("description", "Genre of music that should be played in this scene")
                         }
