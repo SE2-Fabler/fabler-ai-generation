@@ -1,4 +1,4 @@
-package com.kaneki
+package com.kaneki.api
 
 import com.aallam.openai.api.chat.*
 import com.aallam.openai.api.core.Parameters

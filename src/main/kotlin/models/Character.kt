@@ -1,7 +1,7 @@
 package com.kaneki.models
 
 import com.aallam.openai.api.core.Parameters
-import com.kaneki.GPTFunction
+import com.kaneki.api.GPTFunction
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.put

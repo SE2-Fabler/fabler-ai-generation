@@ -1,8 +1,9 @@
-package com.kaneki
+package com.kaneki.models
 
-import com.kaneki.models.*
+import com.kaneki.api.ChatGPT
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
 
 class Story(prompt: String) {
 

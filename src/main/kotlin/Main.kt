@@ -1,5 +1,7 @@
 package com.kaneki
 
+import com.kaneki.models.Story
+
 fun main() {
 
     println("Hello World!")
