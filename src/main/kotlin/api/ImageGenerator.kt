@@ -20,15 +20,9 @@ class ImageGenerator() {
             "extra arms, extra legs, mutated hands, fused fingers, too many fingers, long neck, 2 heads, 2 faces, " +
             "V deformed arm, toy, different eyes, extra ears, double copying of elements face, grain, duplicate, multi, copy"
 
-    suspend fun makeBackground(prompt: String, path: String) {
 
-        val client = HttpClient(CIO) {
-            install(HttpTimeout) {
-                requestTimeoutMillis = 60000
-            }
-        }
-
-        val generationParams = buildJsonObject {
+    fun backgroundParams(prompt: String): JsonObject {
+        return buildJsonObject {
             put("prompt", prompt)
             put("negative_prompt", NEGATIVE_PROMPTS)
             put("seed", -1)
@@ -37,7 +31,31 @@ class ImageGenerator() {
             put("height", 600)
             put("sampler_index", "Euler")
             put("cfg_scale", 7.5)
-        }.toString()
+        }
+    }
+
+    fun characterParams(prompt: String): JsonObject {
+        return buildJsonObject {
+            put("prompt", prompt)
+            put("negative_prompt", NEGATIVE_PROMPTS)
+            put("seed", -1)
+            put("steps", 30)
+            put("width", 512)
+            put("height", 512)
+            put("sampler_index", "Euler")
+            put("cfg_scale", 7)
+        }
+    }
+
+    suspend fun generateImage(params: JsonObject, path: String) {
+
+        val client = HttpClient(CIO) {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 60000
+            }
+        }
+
+        val generationParams = params.toString()
 
         val response: HttpResponse = client.post("http://roppongi:8080/sdapi/v1/txt2img") {
             contentType(ContentType.Application.Json)
