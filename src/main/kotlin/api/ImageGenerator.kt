@@ -51,7 +51,7 @@ class ImageGenerator() {
 
         val client = HttpClient(CIO) {
             install(HttpTimeout) {
-                requestTimeoutMillis = 60000
+                requestTimeoutMillis = 360000
             }
         }
 
