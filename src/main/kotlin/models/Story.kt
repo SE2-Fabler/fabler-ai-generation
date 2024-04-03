@@ -70,7 +70,7 @@ class Story(prompt: String) {
     }
 
 
-    suspend fun generateVisualAssets(outputPath: String) {
+    suspend fun generateVisualAssets() {
 
         val sd = ImageGenerator()
 
