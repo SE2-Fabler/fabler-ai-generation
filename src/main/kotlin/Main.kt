@@ -19,7 +19,7 @@ fun main() {
 
     runBlocking {
 
-        imggen.generateImage(imggen.backgroundParams("an image of a japanese classroom, with lights coming through"), "/home/kaneki/meow.png")
+        imggen.generateImage(imggen.backgroundParams("an image of a japanese classroom, with lights coming through"), System.getenv("HOME") + "/meow.png")
 
     }
 

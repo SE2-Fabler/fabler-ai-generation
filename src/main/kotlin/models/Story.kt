@@ -1,23 +1,21 @@
 package com.kaneki.models
 
 import com.kaneki.api.ChatGPT
+import com.kaneki.api.ImageGenerator
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 
 class Story(prompt: String) {
 
+    val chatGPT = ChatGPT()
+
     var title: String
-
     var synopsis: String
-
     var characters: List<Character>
-
     var scenes: MutableList<Scene>
 
     init {
-
-        val chatGPT = ChatGPT()
 
         runBlocking {
 
@@ -70,6 +68,83 @@ class Story(prompt: String) {
         }
 
     }
+
+
+    suspend fun generateVisualAssets(outputPath: String) {
+
+        val sd = ImageGenerator()
+
+        // Generate background assets
+        for (i in scenes) {
+
+            // Generate Stable Diffusion prompt for the scene
+            val initialPrompt = "${i.location.description}. ${i.location.landmarks}. ${i.location.timeOfDay}."
+
+            chatGPT.addMessage(
+        "Today you are going to be an AI Artist. By that, I mean you gonna need to follow a ART PROMPT structure to make art. You are going to take my art requests.\n" +
+                "\n" +
+                "Here are a few prompt examples.\n" +
+                "\n" +
+                "PROMPT 1:\n" +
+                "\n" +
+                "1girl, Emma Watson as a bishoujo, big eyes, centered headshot portrait casual, indoors, standing,  bokeh,  Makoto Shinkai style\n" +
+                "\n" +
+                "PROMPT 2:\n" +
+                "\n" +
+                "best quality, ultra detailed, 1girl, Lucy Liu as a bishoujo, solo, standing, red hair, long braided hair, golden eyes, bangs, medium breasts, white shirt, necktie, stare, smile, looking at viewer, dark background\n" +
+                "\n" +
+                "PROMPT 3:\n" +
+                "\n" +
+                "1girl, Rihanna as a bishoujo, solo, masterpiece, high quality, professional full body photo, attractive woman, as hardcore hippy, toned physique, scifi, high quality, detailed eyes, eyelashes, Shaved Rainbow hair, slender waist, slender thighs, medium build, toned muscles, perfect face, ideal skin, photorealistic, beautiful clouds, night, cloudy , realistic, sharp focus, 8k high definition, insanely detailed, intricate, elegant\n" +
+                "\n" +
+                "Furthermore, the art you generate will be used as characters in a visual novel.\n" +
+                "If the art request asks for a background, include the scenery/subject and then details, and finally the art style (realistic anime) inside the prompt.\n" +
+                "If the art request asks for a character, include the words \"1person, solo, half body portrait, Makoto Shinkai style\", and that the character looks similar to a random celebrity of your choice, the character's age, gender, clothing, appearance, additional details.\n"
+            )
+
+            val sdPrompt = chatGPT.sendRequest(initialPrompt)
+
+            // Generate SD Image for scene
+            sd.generateImage(sd.backgroundParams(sdPrompt), System.getenv("HOME") + "/vn_gen/images/" + i.location.name + ".png")
+
+        }
+
+        for (i in characters) {
+
+            // Generate Stable Diffusion prompt for the character
+            val initialPrompt = "${i.appearance}. ${i.clothing}."
+
+            chatGPT.addMessage(
+                "Today you are going to be an AI Artist. By that, I mean you gonna need to follow a ART PROMPT structure to make art. You are going to take my art requests.\n" +
+                        "\n" +
+                        "Here are a few prompt examples.\n" +
+                        "\n" +
+                        "PROMPT 1:\n" +
+                        "\n" +
+                        "1girl, Emma Watson as a bishoujo, big eyes, centered headshot portrait casual, indoors, standing,  bokeh,  Makoto Shinkai style\n" +
+                        "\n" +
+                        "PROMPT 2:\n" +
+                        "\n" +
+                        "best quality, ultra detailed, 1girl, Lucy Liu as a bishoujo, solo, standing, red hair, long braided hair, golden eyes, bangs, medium breasts, white shirt, necktie, stare, smile, looking at viewer, dark background\n" +
+                        "\n" +
+                        "PROMPT 3:\n" +
+                        "\n" +
+                        "1girl, Rihanna as a bishoujo, solo, masterpiece, high quality, professional full body photo, attractive woman, as hardcore hippy, toned physique, scifi, high quality, detailed eyes, eyelashes, Shaved Rainbow hair, slender waist, slender thighs, medium build, toned muscles, perfect face, ideal skin, photorealistic, beautiful clouds, night, cloudy , realistic, sharp focus, 8k high definition, insanely detailed, intricate, elegant\n" +
+                        "\n" +
+                        "Furthermore, the art you generate will be used as characters in a visual novel.\n" +
+                        "If the art request asks for a background, include the scenery/subject and then details, and finally the art style (realistic anime) inside the prompt.\n" +
+                        "If the art request asks for a character, include the words \"1person, solo, half body portrait, Makoto Shinkai style\", and that the character looks similar to a random celebrity of your choice, the character's age, gender, clothing, appearance, additional details.\n"
+            )
+
+            val sdPrompt = chatGPT.sendRequest(initialPrompt)
+
+            // Generate SD Image for scene
+            sd.generateImage(sd.backgroundParams(sdPrompt), System.getenv("HOME") + "/vn_gen/images/" + i.name + ".png")
+
+        }
+
+    }
+
 
     override fun toString(): String {
         return "Title: ${title}\n" +
